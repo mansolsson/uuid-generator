@@ -5,6 +5,7 @@ import org.junit.Test;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class TestUUIDGenerator {
     private static final UUID NAMESPACE_1 = UUID.fromString("6ba7b810-9dad-11d1-80b4-00c04fd430c8");
@@ -15,6 +16,9 @@ public class TestUUIDGenerator {
         UUID type3 = UUIDGenerator.generateType3(NAMESPACE_1, "test");
         assertEquals(2, type3.variant());
 
+        UUID type4 = UUIDGenerator.generateType4();
+        assertEquals(2, type4.variant());
+
         UUID type5 = UUIDGenerator.generateType5(NAMESPACE_1, "test");
         assertEquals(2, type5.variant());
     }
@@ -23,6 +27,9 @@ public class TestUUIDGenerator {
     public void testThatVersionIsCorrect() {
         UUID type3 = UUIDGenerator.generateType3(NAMESPACE_1, "test");
         assertEquals(3, type3.version());
+
+        UUID type4 = UUIDGenerator.generateType4();
+        assertEquals(4, type4.version());
 
         UUID type5 = UUIDGenerator.generateType5(NAMESPACE_1, "test");
         assertEquals(5, type5.version());
@@ -34,6 +41,11 @@ public class TestUUIDGenerator {
         assertEquals(UUID.fromString("f1917643-06b2-3e6d-ab77-0a5044067d0a"), UUIDGenerator.generateType3(NAMESPACE_1, "test2"));
         assertEquals(UUID.fromString("665d82d4-3cd1-3d56-afa0-9582dc93bbab"), UUIDGenerator.generateType3(NAMESPACE_2, "test1"));
         assertEquals(UUID.fromString("a6893162-449e-357d-87c0-301a575e15e7"), UUIDGenerator.generateType3(NAMESPACE_2, "test2"));
+    }
+
+    @Test
+    public void testThatType4GenerateDifferentResultsEachTime() {
+        assertNotEquals(UUIDGenerator.generateType4(), UUIDGenerator.generateType4());
     }
 
     @Test

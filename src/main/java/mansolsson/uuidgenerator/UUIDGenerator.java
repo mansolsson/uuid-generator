@@ -3,32 +3,48 @@ package mansolsson.uuidgenerator;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.UUID;
 
 public final class UUIDGenerator {
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
     private UUIDGenerator() {
     }
 
     public static UUID generateType3(UUID namespace, String name) {
-        return generateUUID(namespace, name, "MD5", 3);
+        return generateNameBasedUUID(namespace, name, "MD5", 3);
+    }
+
+    public static UUID generateType4() {
+        byte[] randomBytes = new byte[16];
+        SECURE_RANDOM.nextBytes(randomBytes);
+        return generateUUID(randomBytes, 4);
     }
 
     public static UUID generateType5(UUID namespace, String name) {
-        return generateUUID(namespace, name, "SHA-1", 5);
+        return generateNameBasedUUID(namespace, name, "SHA-1", 5);
     }
 
-    private static UUID generateUUID(UUID namespace, String name, String algorithm, int version) {
+    private static UUID generateNameBasedUUID(UUID namespace, String name, String algorithm, int version) {
         byte[] hash = generateHash(namespace, name, algorithm);
+        return generateUUID(hash, version);
+    }
 
-        // Version
-        hash[6] = (byte) (hash[6] & 0b0000_1111);
-        hash[6] = (byte) (hash[6] | (version << 4));
+    private static UUID generateUUID(byte[] bytes, int version) {
+        setVersion(bytes, version);
+        setVariant(bytes);
+        return fromBytes(bytes);
+    }
 
-        // Variant
-        hash[8] = (byte) (hash[8] & 0b0011_1111);
-        hash[8] = (byte) (hash[8] | 0b1000_0000);
+    private static void setVersion(byte[] bytes, int version) {
+        bytes[6] = (byte) (bytes[6] & 0b0000_1111);
+        bytes[6] = (byte) (bytes[6] | (version << 4));
+    }
 
-        return fromBytes(hash);
+    private static void setVariant(byte[] bytes) {
+        bytes[8] = (byte) (bytes[8] & 0b0011_1111);
+        bytes[8] = (byte) (bytes[8] | 0b1000_0000);
     }
 
     private static byte[] generateHash(UUID namespace, String name, String algorithm) {
