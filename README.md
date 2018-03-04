@@ -1,2 +1,2 @@
 # uuid-generator
-Generate name based UUID's
+Generate version 3 and 5 name-based UUIDs following the instructions in RFC 4122.
